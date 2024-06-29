@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "paraphrizer-site"
+version = "0.1.0"
+description = "Welcome to the Tree Paraphraser!"
+authors = ["virginia-wolfi <miss_lilu@ukr.net>"]
+license = "Our application harnesses the power of natural language processing (NLP) and syntactic analysis to provide a unique tool for generating paraphrases based on syntactic tree structures. Ideal for linguistic analysis, creative writing, and educational purposes, the Tree Paraphraser offers a fascinating exploration of sentence structure and meaning."
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Flask = "^3.0.3"
+Flask-WTF = "^1.2.1"
+nltk = "^3.8.1"
+requests = "^2.32.3"
+wtforms = "^3.1.2"
+ruff = "^0.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

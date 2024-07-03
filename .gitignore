@@ -1,6 +1,6 @@
 *.pyc
 __pycache__/
-
+.idea
 instance/
 
 .pytest_cache/

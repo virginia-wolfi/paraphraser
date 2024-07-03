@@ -1,0 +1,8 @@
+:root {
+    --color-dark: #282828;
+    --color-grey100: #888;
+    --color-grey300: #f4f4f4;
+    --color-active: #f7797d;
+    --ease: cubic-bezier(0.73, 0.09, 0.21, 0.96);
+    --time: 250ms;
+}

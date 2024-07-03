@@ -19,7 +19,7 @@ class PermutedSyntaxTree:
     """
 
     CONJUNCTIONS = (",", "CC")
-    TAGS = ("NP", "NN", "N", "NNS", "VP", "UCP", "S")
+    TAGS = ("NP", "NN", "N", "NNS", "ADJP", "UCP", "S" ,'VP', "VBG")
 
     def __init__(self, syntax_tree: str) -> None:
         """
@@ -70,12 +70,8 @@ class PermutedSyntaxTree:
         current_node_key = self.tagged_nodes_keys[depth]
         node_positions = self.tagged_nodes_positions[current_node_key]
         subtrees_to_permute = [tree[pos] for pos in node_positions]
+
         tree_permutations = list(permutations(subtrees_to_permute))
-        # Exclude the first permutation to avoid redundant processing of previously permuted subtrees
-        # We do not exclude the first permutation at max nesting depth
-        # to ensure all permutations are generated at the deepest level
-        if depth < self.max_depth - 1:
-            tree_permutations = tree_permutations[1:]
         for permutation in tree_permutations:
             new_tree = nltk.tree.Tree.convert(tree)
             for i, pos in enumerate(node_positions):
@@ -90,10 +86,9 @@ class PermutedSyntaxTree:
 
         def traverse_and_permute(tree: nltk.Tree, depth=self.max_depth - 1):
             if depth == -1:
-                return
+                self.all_permuted_trees.append(tree)
             else:
                 permuted_trees = self.permute_subtrees_at_depth(tree, depth)
-                self.all_permuted_trees.extend(permuted_trees)
                 for permuted_tree in permuted_trees:
                     traverse_and_permute(permuted_tree, depth - 1)
 
@@ -104,4 +99,32 @@ class PermutedSyntaxTree:
         permutations = self.all_permuted_trees
         if not permutations:
             permutations = self.get_all_permutations()
-        return [" ".join(tree.leaves()) for tree in permutations]
+        return sorted([" ".join(tree.leaves()) for tree in permutations])
+
+pst = """
+(ROOT
+  (S
+    (NP
+      (NP (DT The) (JJ charming) (JJ Gothic) (NN Quarter))
+      (, ,)
+      (CC or)
+      (NP (NNP Barri) (NNP Gòtic))
+      (, ,))
+    (VP
+      (VBZ has)
+      (NP
+        (NP (JJ narrow) (JJ medieval) (NNS streets))
+        (VP
+          (VBN filled)
+          (PP
+            (IN with)
+            (NP
+              (NP (JJ trendy) (NNS bars))
+              (, ,)
+              (NP (NNS clubs))
+              (CC and)
+              (NP (NNP Catalan) (NNS restaurants)))))))
+    (. .)))
+"""
+
+

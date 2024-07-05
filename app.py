@@ -19,7 +19,7 @@ def index():
             pst = PermutedSyntaxTree(tree)
             permutations = pst.get_permutations_as_string()
             tree = pst.tree
-        except Exception:
+        except ValueError:
             exception = 'You provided an incorrect sentence'
             return render_template("index.html", exception=exception, form=form)
 

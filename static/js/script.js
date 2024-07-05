@@ -4,14 +4,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update the textarea placeholder based on the active pill
     function updatePlaceholder() {
-        const activePill = document.querySelector('.pill.active');
-        if (activePill) {
-            const value = activePill.getAttribute('data-value');
-            textarea.placeholder = value === 'tree' ?
-                'Enter a sentence in syntax tree mode.' :
-                'Enter a sentence in human language mode.';
-        }
+    const activePill = document.querySelector('.pill.active');
+    if (activePill) {
+        const value = activePill.getAttribute('data-value');
+        const textarea = document.querySelector('textarea[name="sentence"]');
+        textarea.placeholder = value === 'tree' ?
+            '(ROOT\n  (S\n    (NP (NNP Sunset))\n    (VP\n      (VBD painted)\n      (NP (DT the) (NN sky))\n      (PP\n        (IN in)\n        (NP\n          (NP (NNS hues))\n          (PP (IN of) (NP (NN orange) (CC and) (NN pink)))))\n      (. .)))' :
+            'Sunset painted the sky and sea in hues of orange and pink.';
     }
+}
 
     // Add event listeners to pills for click events
     pills.forEach(function(pill) {

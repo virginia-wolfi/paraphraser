@@ -2,24 +2,44 @@ from itertools import permutations
 
 import nltk
 
-
 class PermutedSyntaxTree:
     """
     A class to generate permutations of a syntax tree based on specific tagged nodes and conjunctions.
 
-    The class traverses the syntax tree recursively from lower-level subtrees to higher-level subtrees to find all possible permutations.
+    This class traverses the syntax tree recursively from lower-level subtrees to higher-level subtrees
+    to find all possible permutations. It considers specific tag groups to ensure permutations are meaningful
+    and syntactically valid.
 
     Attributes:
         CONJUNCTIONS (tuple): A tuple of conjunction labels to consider for permutations.
-        TAGS (tuple): A tuple of subtree tags to consider for permutations.
-        tree (nltk.Tree): The syntax tree represented as a nltk.Tree object.
+        TAG_GROUPS (list of tuples): A list of tuples where each tuple contains tags to consider for permutations together.
+        tree (nltk.Tree): The syntax tree represented as an nltk.Tree object.
         tagged_nodes_positions (dict): A dictionary storing positions of tagged subtrees that can be permuted.
         tagged_nodes_keys (list): A list of keys representing the positions of tagged subtrees.
         max_depth (int): The depth of nested tagged subtrees.
+        all_permuted_trees (list): A list to store all permutations of the syntax tree.
     """
 
     CONJUNCTIONS = (",", "CC")
-    TAGS = ("NP", "NN", "N", "NNS", "ADJP", "UCP", "S" ,'VP', "VBG")
+    TAG_GROUPS = [
+        ("NN", "NNS", "N", "NNP"),             # Singular and plural nouns
+        ("NP", "NPS"),                  # Noun phrases
+        ("VB", "VBD", "VBG", "VBN", "VBP", "VBZ"),  # Verb forms
+        ("VP",),                        # Verb phrases
+        ("ADJP", "UCP"),                # Adjective phrases
+        ("JJ", "JJR", "JJS"),           # Adjectives
+        ("RB", "RBR", "RBS"),           # Adverbs
+        ("S",),                         # Sentences                # Prepositional phrases
+        ("DT", "PDT", "WDT"),           # Determiners
+        ("PRP", "PRP$", "WP", "WP$"),   # Pronouns
+        ("CD",),                        # Cardinals (numbers)
+        ("CC",),                        # Coordinating conjunctions
+        ("UH",),                        # Interjections
+        ("MD",),                        # Modal verbs
+        ("EX",),                        # Existential 'there'
+        ("SYM",),                       # Symbols
+        ("FW",)                         # Foreign words
+    ]
 
     def __init__(self, syntax_tree: str) -> None:
         """
@@ -29,39 +49,40 @@ class PermutedSyntaxTree:
         self.tree = nltk.Tree.fromstring(syntax_tree)
         self.tagged_nodes_positions = dict()
         self.find_permutable_positions()
-        self.tagged_nodes_keys = list(self.tagged_nodes_positions)
+        self.tagged_nodes_keys = sorted(list(self.tagged_nodes_positions))
         self.max_depth = len(self.tagged_nodes_keys)
         self.all_permuted_trees = []
 
-    def find_permutable_positions(self, conj_set=CONJUNCTIONS, tags=TAGS) -> None:
+    def find_permutable_positions(self, conj_set: tuple[str] = CONJUNCTIONS, tag_groups: list[tuple] = TAG_GROUPS) -> None:
         """
         Finds and stores the positions of tagged subtrees that can be permuted.
         """
 
         tree = nltk.ParentedTree.convert(self.tree)
-        subtrees = tree.subtrees(lambda t: t.label() in tags)
-        for node in subtrees:
-            # The right sibling must be a conjunction
-            conj = node.right_sibling()
-            while conj and conj.label() in conj_set:
-                next_sibling = conj.right_sibling()
-                if next_sibling and next_sibling.label() in tags:
-                    pos = node.treeposition()[:-1]
-                    permutable_positions = self.tagged_nodes_positions.setdefault(
-                        pos, []
-                    )
-                    if node.treeposition() not in permutable_positions:
-                        permutable_positions.extend(
-                            [
-                                node.treeposition(),
-                                next_sibling.treeposition(),
-                            ]
+        for tags in tag_groups:
+            subtrees = tree.subtrees(lambda t: t.label() in tags)
+            for node in subtrees:
+                # The right sibling must be a conjunction
+                conj = node.right_sibling()
+                while conj and conj.label() in conj_set:
+                    next_sibling = conj.right_sibling()
+                    if next_sibling and next_sibling.label() in tags:
+                        pos = node.treeposition()[:-1]
+                        permutable_positions = self.tagged_nodes_positions.setdefault(
+                            pos, []
                         )
-                    else:
-                        permutable_positions.append(next_sibling.treeposition())
-                conj = next_sibling  # move to the next conjunction if present
+                        if node.treeposition() not in permutable_positions:
+                            permutable_positions.extend(
+                                [
+                                    node.treeposition(),
+                                    next_sibling.treeposition(),
+                                ]
+                            )
+                        else:
+                            permutable_positions.append(next_sibling.treeposition())
+                    conj = next_sibling  # move to the next conjunction if present
 
-    def permute_subtrees_at_depth(self, tree: nltk.Tree, depth) -> list[nltk.Tree]:
+    def permute_subtrees_at_depth(self, tree: nltk.Tree, depth: int) -> list[nltk.Tree]:
         """
         Generates all permutations of the tagged subtrees at a specific depth.
         """
@@ -84,7 +105,7 @@ class PermutedSyntaxTree:
         Recursively generates all possible permutations of the syntax tree.
         """
 
-        def traverse_and_permute(tree: nltk.Tree, depth=self.max_depth - 1):
+        def traverse_and_permute(tree: nltk.Tree, depth: int = self.max_depth - 1):
             if depth == -1:
                 self.all_permuted_trees.append(tree)
             else:
@@ -96,35 +117,24 @@ class PermutedSyntaxTree:
         return self.all_permuted_trees
 
     def get_permutations_as_string(self) -> list[str]:
+        """
+        Returns all permutations as strings, ensuring proper spacing and punctuation.
+
+        Returns:
+            list[str]: A list of strings representing all permuted syntax trees.
+        """
         permutations = self.all_permuted_trees
         if not permutations:
             permutations = self.get_all_permutations()
-        return sorted([" ".join(tree.leaves()) for tree in permutations])
 
-pst = """
-(ROOT
-  (S
-    (NP
-      (NP (DT The) (JJ charming) (JJ Gothic) (NN Quarter))
-      (, ,)
-      (CC or)
-      (NP (NNP Barri) (NNP Gòtic))
-      (, ,))
-    (VP
-      (VBZ has)
-      (NP
-        (NP (JJ narrow) (JJ medieval) (NNS streets))
-        (VP
-          (VBN filled)
-          (PP
-            (IN with)
-            (NP
-              (NP (JJ trendy) (NNS bars))
-              (, ,)
-              (NP (NNS clubs))
-              (CC and)
-              (NP (NNP Catalan) (NNS restaurants)))))))
-    (. .)))
-"""
+        result = []
+        punctuation_marks = [",", ".", "!", "?", ";", ":"]
+        for tree in permutations:
+            sentence = " ".join(tree.leaves())
+            for mark in punctuation_marks:
+                sentence = sentence.replace(f" {mark}", mark)
+            result.append(sentence)
+
+        return sorted(result)
 
 

@@ -4,6 +4,7 @@
     <title>Sentence Permutation</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta property='og:title' content='Syntax tree permutator'/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
@@ -12,6 +13,7 @@
     <div class="formWrapper col-12 d-flex flex-column flex-lg-row justify-content-space-between align-items-center h-auto mb-4 ">
         <div class="formContent d-block col-12 col-lg-6">
             <h1 class="mb-2">Sentence permutator</h1>
+
             <form id="myForm" action="{{ url_for('index')}}" method="post">
                 <div class="pills d-block d-md-inline-flex gap-2">
                     {% for choice, label in form.mode.choices %}
@@ -28,9 +30,9 @@
             </form>
         </div>
         {% if tree %}
-        <pre class="col-12 col-lg-6 p-20 h-100">{{ tree }}</pre>
+        <pre class="col-12 col-lg-6 p-20">{{ tree }}</pre>
         {% elif exception %}
-        <pre class="col-12 col-lg-6 p-20 h-100">{{ exception }}</pre>
+        <p class="col-12 col-lg-6 ml-2 p-20">{{ exception }}</p>
         {% else %}
         <div class="imageArea h-md-5"></div>
         {% endif %}
@@ -43,5 +45,6 @@
     </ul>
     {% endif %}
 </div>
+<div class="spacer"></div>
 </body>
 </html>

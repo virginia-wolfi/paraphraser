@@ -1,11 +1,12 @@
 <!doctype html>
 <html>
 <head>
-    <title>Sentence Permutation</title>
+    <title>Sentence Permutator</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta property='og:title' content='Syntax tree permutator'/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
@@ -13,8 +14,8 @@
     <div class="formWrapper col-12 d-flex flex-column flex-lg-row justify-content-space-between align-items-center h-auto mb-4 ">
         <div class="formContent d-block col-12 col-lg-6">
             <h1 class="mb-2">Sentence permutator</h1>
-
-            <form id="myForm" action="{{ url_for('index')}}" method="post">
+            <p>Generate all possible permutations of the sentence parts separated by conjunctions</p>
+            <form action="{{ url_for('index')}}" method="post">
                 <div class="pills d-block d-md-inline-flex gap-2">
                     {% for choice, label in form.mode.choices %}
                     <div class="pill {% if loop.first and not form.mode.data or form.mode.data == choice %}active{% endif %}"

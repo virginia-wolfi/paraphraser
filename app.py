@@ -20,7 +20,7 @@ def index():
             permutations = pst.get_permutations_as_string()
             tree = pst.tree
         except ValueError:
-            exception = 'You provided an incorrect sentence'
+            exception = 'You provided an incorrect tree'
             return render_template("index.html", exception=exception, form=form)
 
         return render_template(
@@ -28,7 +28,3 @@ def index():
         )
 
     return render_template("index.html", form=form)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
